@@ -1,12 +1,10 @@
-select Customer.CustomerId, RegistrationDateTime
-from Customer join (
-	select * 
-	from Product 
-	where ProductName='молоко' and CustomerId not in 
-	(
-		select CustomerId 
-		from Product 
-		where ProductName='сметана' and DATEDIFF(MONTH, PurchaiseDateTime, GETDATE()) <= 1
-	)
-	) as TempTable
-on Customer.CustomerId = TempTable.CustomerId
+select c.CustomerId, RegistrationDateTime 
+from [Example].[dbo].[Product] (nolock) c left join
+  (select * 
+  from [Example].[dbo].[Product] (nolock) t 
+  where t.[PurchaiseDateTime] > dateadd(month, -1, getdate()) and t.ProductName = 'сметана'
+  ) t
+on c.CustomerId = t.CustomerId
+inner join [Example].[dbo].[Customer] (nolock) cu
+on c.CustomerId = cu.CustomerId
+where c.ProductName = 'молоко' and t.CustomerId is null
