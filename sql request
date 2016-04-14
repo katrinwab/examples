@@ -1,0 +1,12 @@
+select Customer.CustomerId, RegistrationDateTime
+from Customer join (
+	select * 
+	from Product 
+	where ProductName='молоко' and CustomerId not in 
+	(
+		select CustomerId 
+		from Product 
+		where ProductName='сметана' and DATEDIFF(MONTH, PurchaiseDateTime, GETDATE()) <= 1
+	)
+	) as TempTable
+on Customer.CustomerId = TempTable.CustomerId
